@@ -1,0 +1,110 @@
+{
+  "family": "agriai-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::730335617294:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "agriai",
+      "image": "730335617294.dkr.ecr.ap-south-1.amazonaws.com/agriai-api:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+           "name": "AWS_ACCESS_KEY_ID",
+           "value": "YOUR_AWS_ACCESS_KEY_ID"
+         },
+         {
+           "name": "AWS_SECRET_ACCESS_KEY",
+           "value": "YOUR_AWS_SECRET_ACCESS_KEY"
+         },
+        {
+          "name": "AWS_REGION",
+          "value": "ap-south-1"
+        },
+        {
+          "name": "SONNET_INFERENCE_PROFILE_ARN",
+          "value": "arn:aws:bedrock:ap-south-1:730335617294:inference-profile/apac.anthropic.claude-3-5-sonnet-20240620-v1:0"
+        },
+         {
+           "name": "MONGODB_URI",
+           "value": "YOUR_MONGODB_URI"
+         },
+        {
+          "name": "MONGO_DATABASE",
+          "value": "dev"
+        },
+        {
+          "name": "MONGO_COLLECTION",
+          "value": "ai-image-data-fetch"
+        },
+        {
+          "name": "S3_BUCKET_NAME",
+          "value": "ai-img-upload"
+        },
+        {
+          "name": "S3_ORIGINAL_PREFIX",
+          "value": "originals/"
+        },
+        {
+          "name": "S3_ANNOTATED_PREFIX",
+          "value": "annotated/"
+        },
+        {
+          "name": "USE_OBJECT_DETECTION",
+          "value": "true"
+        },
+        {
+          "name": "YOLO_MODEL_PATH",
+          "value": "yolov8n.pt"
+        },
+        {
+          "name": "YOLO_USE_API",
+          "value": "false"
+        },
+        {
+          "name": "DETECTION_BACKEND",
+          "value": "roboflow"
+        },
+         {
+           "name": "ROBOFLOW_API_KEY",
+           "value": "YOUR_ROBOFLOW_API_KEY"
+         },
+        {
+          "name": "ROBOFLOW_MODEL_ID",
+          "value": "thesis-project-kbu79/palm-daffan"
+        },
+        {
+          "name": "ROBOFLOW_VERSION",
+          "value": "1"
+        },
+        {
+          "name": "DETECTION_CONFIDENCE",
+          "value": "0.80"
+        },
+        {
+          "name": "S3_PRESIGNED_URL_EXPIRATION",
+          "value": "3600"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/agriai",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
