@@ -2,6 +2,18 @@
 
 A production-ready AI-powered agricultural analysis system for detecting and analyzing oil palm fruit bunches with precise bounding box detection, ripeness classification, and health assessment.
 
+---
+
+## 🌳 FFB Multi-View Counting Project
+
+**New Project:** Multi-view unique FFB counting using 3D triangulation  
+**Documentation:** See [`docs/README.md`](docs/README.md)  
+**Current Status:** Phase 1 - Data Annotation & Training  
+
+For FFB project work: Start at [`docs/README.md`](docs/README.md)
+
+---
+
 ## Features
 
 - **Advanced Fruit Bunch Detection**: Uses Roboflow + Hybrid AI analysis for accurate detection
