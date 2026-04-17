@@ -51,6 +51,8 @@ logs/
 .coverage
 htmlcov/
 
+/FFB-Yolo1
+
 # FastAPI
 .pytest_cache
 
@@ -63,6 +65,17 @@ temp/
 tmp/
 Zoomedin.jpeg
 Zoomedout.jpeg
+
+# YOLO Dataset (images are too heavy)
+data/yolo_dataset/images/
+data/yolo_dataset/labels/
+FFB-Yolo1/
+
+# Model weights and training outputs
+weights/
+runs/
+*.pt
+
 SG9-RW010SS-10T-40P-070326 - SMTF1/SG9-RW010SS-T1/RW010SS-T1-1A-S.jpg
 SG9-RW010SS-10T-40P-070326 - SMTF1/SG9-RW010SS-T1/RW010SS-T1-1B-S.jpg
 SG9-RW010SS-10T-40P-070326 - SMTF1/SG9-RW010SS-T1/RW010SS-T1-2A-S.jpg
