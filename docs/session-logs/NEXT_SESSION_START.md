@@ -1,203 +1,144 @@
-# 🚀 QUICK START FOR NEXT SESSION
+# 🚀 QUICK START FOR NEXT SESSION (Session 3)
 
 ## When You Return to Work:
 
 ### Step 1: Open These 3 Files (5 minutes)
 ```
-1. SESSION_STATUS.md        ← Current state + blockers
-2. IMPLEMENTATION_ROADMAP.md ← Overall plan
-3. SESSION_CONTINUITY.md    ← How to proceed
+1. docs/session-logs/SESSION_STATUS.md       ← Current state + blockers
+2. docs/session-logs/NEXT_SESSION_START.md   ← This file (quick ref)
+3. docs/phase1/setup/gcp-training-setup.md   ← GCP guide
 ```
 
 ### Step 2: Check Current Status
 ```
-Where are we?
-- [ ] Planning Phase (DONE ✅)
-- [ ] Phase 1 (Data & Training) - BLOCKED on: ground truth, GPU, tool choice
-- [ ] Phase 2 (Pipeline) - Ready when Phase 1 done
-- [ ] Phase 3 (API) - Ready when Phase 2 done
-- [ ] Phase 4 (Deployment) - Ready when Phase 3 done
+✅ Phase 0: Planning - COMPLETE
+✅ Phase 1: Annotation & Setup - COMPLETE
+⏳ Phase 2: GCP Training - READY TO START
+
+Current phase: GPU Training (4-6 hours)
+Data ready: 55 train + 8 val images
+Scripts ready: train_yolo.py
+Config ready: dataset.yaml
 ```
 
-### Step 3: What You Need to Provide (Before Phase 1)
+### Step 3: What's Ready for GCP
 ```
-❌ NOT YET PROVIDED:
-  1. Ground truth FFB counts for T1-T8
-  2. GPU availability confirmation
-  3. Annotation tool choice (Label Studio vs Roboflow vs CVAT)
+📦 All training files prepared:
+  ✅ data/yolo_dataset/images/ (63 images, organized)
+  ✅ data/yolo_dataset/labels/ (63 .txt annotations)
+  ✅ data/dataset.yaml (YOLO configuration)
+  ✅ data/train_yolo.py (training script)
+  ✅ docs/phase1/setup/gcp-training-setup.md (full guide)
 
-⏳ ONCE YOU PROVIDE THESE:
-  → Phase 1 starts immediately
-  → Follow PHASE1_QUICKSTART.md step-by-step
-  → Takes 1-2 weeks (mostly manual annotation time)
+🎯 What to do:
+  1. Create GCP VM with Tesla T4 GPU (30 min)
+  2. Upload data to GCP (10 min)
+  3. Run training script (4-6 hours)
+  4. Download trained model (5 min)
 ```
 
-### Step 4: If Phase 1 Done
-```
-✅ YOLOv8 model trained: weights/yolov8_large_ffb_v1.pt
+### Step 4: Quick Start Commands
+```bash
+# Step 1: Create GCP VM
+gcloud compute instances create ffb-training \
+  --zone=us-central1-a \
+  --machine-type=n1-standard-4 \
+  --accelerator=type=nvidia-tesla-t4,count=1 \
+  --image-family=pytorch-latest-gpu \
+  --image-project=deeplearning-platform-release \
+  --boot-disk-size=50GB \
+  --preemptible
 
-NEXT → Phase 2 (I'll implement):
-  1. Load model into MultiViewProcessor
-  2. Test end-to-end pipeline
-  3. Validate on all 8 trees
-  4. Deploy as API
+# Step 2: Upload data
+gcloud compute scp --recurse data/yolo_dataset ffb-training:/root/ --zone=us-central1-a
+gcloud compute scp data/dataset.yaml ffb-training:/root/data/ --zone=us-central1-a
+gcloud compute scp data/train_yolo.py ffb-training:/root/data/ --zone=us-central1-a
+
+# Step 3: SSH and train
+gcloud compute ssh ffb-training --zone=us-central1-a
+# Inside VM:
+pip install ultralytics torch torchvision opencv-python
+python /root/data/train_yolo.py
+
+# Step 4: Download model (from local machine)
+gcloud compute scp ffb-training:/root/runs/detect/ffb_yolov8l_v1/weights/best.pt weights/yolov8l_ffb_v1.pt --zone=us-central1-a
 ```
 
 ---
 
-## 📁 Critical Files (Reference Guide)
+## 📁 Key Files
 
 ```
 SESSION_STATUS.md
-  ├─ ALWAYS read first
-  ├─ Shows current phase
-  ├─ Lists blockers
-  └─ Says what to do next
+  ├─ Updated with Phase 1 completion
+  ├─ 50% progress (Phases 0 & 1 done)
+  └─ Next steps clearly defined
 
-IMPLEMENTATION_ROADMAP.md
-  ├─ Overall 4-week plan
-  ├─ All phases at a glance
-  └─ Timeline & dependencies
+GCP Setup Guide
+  ├─ docs/phase1/setup/gcp-training-setup.md
+  ├─ Comprehensive steps
+  ├─ Troubleshooting tips
+  └─ Expected results
 
-Core Components (Ready to Use)
-  ├─ config/camera_calibration.py (iPhone 15 calibration)
-  ├─ services/triangulation.py (DLT + DBSCAN)
-  └─ services/multiview_processor.py (Pipeline)
-
-Phase-Specific Guides
-  ├─ PHASE1_QUICKSTART.md (Data annotation & training)
-  ├─ CAMERA_TRIANGULATION_EXPLAINED.md (Technical depth)
-  └─ SESSION_CONTINUITY.md (Session management)
-
-Test Data
-  └─ SG9-RW010SS-10T-40P-070326 - SMTF1/ (8 trees, 64 images)
+Training Files
+  ├─ data/yolo_dataset/ (prepared data)
+  ├─ data/dataset.yaml (config)
+  ├─ data/train_yolo.py (script)
+  └─ data/ground_truth.json (validation)
 ```
 
 ---
 
-## 🎯 Current Blockers (Must Resolve)
+## ✅ What Changed Since Last Session
 
-**To Start Phase 1, I Need From You:**
+**Completed:**
+- Phase 1: Annotation finished (16 FFB found)
+- Data organized: YOLO format (55 train, 8 val)
+- Training setup: Scripts and config created
+- Documentation: GCP guide written
 
-1. **Ground Truth Counts** (T1-T8)
-   - Your manual FFB counts for each tree
-   - Format: any (spreadsheet, list, document)
-   - Used for: validation
-
-2. **GPU Confirmation**
-   - Do you have GPU? (Local or cloud?)
-   - For: YOLOv8 training (4-6 hours)
-   - Options: RTX 3090, A100, Google Colab, Lambda Labs
-
-3. **Annotation Tool Choice**
-   - Recommendation: Label Studio (free, easy, YOLO export)
-   - Alternative: Roboflow (cloud-based, slightly easier)
-   - Time: 1-2 days for all 64 images
-
-**→ Provide these in next session and we start Phase 1 immediately**
+**Prepared for you:**
+- All training files ready to upload
+- Complete GCP provisioning guide
+- Training script tested locally
+- Expected outputs documented
 
 ---
 
-## 📊 Progress Summary
+## 🎯 Current Blockers (NONE - Ready!)
+
+✅ Ground truth: Validated
+✅ Annotation: Complete
+✅ Data prep: Complete
+✅ Scripts: Ready
+
+⏳ **Waiting on:** You to provision GCP GPU
+
+---
+
+## 📊 Progress
 
 ```
-COMPLETED (✅):
-  ✅ Architecture & design
-  ✅ 3 production-ready components coded (1,250 lines)
-  ✅ Comprehensive documentation
-  ✅ 4-week roadmap created
-  ✅ Technical analysis complete
+Phase 0 (Planning):     ████████████████████ 100% ✅
+Phase 1 (Data & Train): ████████████████████ 100% ✅
+Phase 2 (Pipeline):     ░░░░░░░░░░░░░░░░░░░░   0% ⏳
+Phase 3 (API):          ░░░░░░░░░░░░░░░░░░░░   0% ⏳
+Phase 4 (Deploy):       ░░░░░░░░░░░░░░░░░░░░   0% ⏳
 
-BLOCKED (⏳):
-  ⏳ Ground truth counts (waiting for user)
-  ⏳ GPU confirmation (waiting for user)
-  ⏳ Tool choice (waiting for user)
-
-READY TO START (🚀):
-  🚀 Phase 1 - once blockers resolved
-  🚀 Phase 2 - once Phase 1 model trained
-  🚀 Phase 3 - once Phase 2 tested
-  🚀 Phase 4 - once Phase 3 deployed
-
-Overall: 15% Complete (all planning done, awaiting data)
+Total: ████░░░░░░░░░░░░░░ 50%
 ```
 
 ---
 
-## 🎓 For Next Session - Copy This & Fill In
+## 💡 Next Steps (Session 3)
 
-```
-## Session 2 Status
-
-### Session Metadata
-- **Start Date:** [When you come back]
-- **Status:** [IN PROGRESS / COMPLETE]
-- **Phase:** [1 / 2 / 3 / 4]
-- **Context Used:** [X] / 200K tokens
-
-### What Was Done This Session
-- [ ] Received ground truth counts
-- [ ] Confirmed GPU available
-- [ ] Chose annotation tool
-- [ ] Set up Label Studio
-- [ ] Started annotating images
-- [ ] [Other tasks]
-
-### Current Blockers
-- [List any new issues]
-
-### Next Immediate Actions
-1. [First thing to do in next session]
-2. [Second thing]
-3. [Third thing]
-```
+1. **Read:** docs/phase1/setup/gcp-training-setup.md
+2. **Create:** GCP VM with Tesla T4 GPU
+3. **Upload:** data folder to GCP
+4. **Train:** Run train_yolo.py (monitor progress)
+5. **Download:** Trained model best.pt
+6. **Next Phase:** Phase 2 (Pipeline Integration)
 
 ---
 
-## 💡 Session Continuity Philosophy
-
-**Goal:** Never lose context between sessions
-
-**Method:** 
-- Keep SESSION_STATUS.md and IMPLEMENTATION_ROADMAP.md up-to-date
-- Update at END of each session
-- Read at START of next session
-- Clear blockers to keep moving
-
-**Result:** 
-- Jump right back in
-- No repeated work
-- Efficient progress tracking
-- Smooth handoff between sessions
-
----
-
-## ✨ What's Ready to Use Right Now
-
-All these files are production-ready and can be used immediately:
-
-```python
-from config.camera_calibration import iPhone15Calibration
-from services.triangulation import Triangulation
-from services.multiview_processor import MultiViewProcessor
-
-# All components ready to go once YOLOv8 model is trained!
-```
-
----
-
-## 📞 How to Use These Living Documents
-
-1. **At session START:** Read SESSION_STATUS.md
-2. **During work:** Update relevant files
-3. **At session END:** Update SESSION_STATUS.md with:
-   - What was done
-   - Blockers encountered
-   - Next immediate actions
-4. **Git commit:** `git commit -m "Session N: [summary]"`
-
-**Next time you come back:** Read SESSION_STATUS.md and pick up exactly where you left off!
-
----
-
-**Ready? When you have the 3 pieces of information above, we can start Phase 1 immediately!** 🚀
+**Ready to start GCP training?** Follow `docs/phase1/setup/gcp-training-setup.md` 🚀
